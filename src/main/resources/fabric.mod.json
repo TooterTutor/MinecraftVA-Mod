@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "minecraftva",
+  "version": "${version}",
+  "name": "MinecraftVA",
+  "description": "A bridge between Minecraft and VoiceAttack",
+  "authors": [
+    "TooterTutor"
+  ],
+  "contact": {
+    "repo": "https://github.com/TooterTutor/MinecraftVA"
+  },
+  "license": "MIT",
+  "icon": "assets/minecraftva/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "io.github.tootertutor.minecraftva.MinecraftVA"
+    ]
+  },
+  "mixins": [
+    "minecraftva.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
