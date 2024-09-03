@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,12 +60,12 @@ public class MinecraftVA implements ModInitializer {
             if (initialized) {
                 if (updateKeybindMapping.wasPressed()) {
                     updateKeybinds();
-                    client.player.sendMessage(net.minecraft.text.Text.literal("VoiceAttack API: Keybind mappings updated"), false);
+                    client.player.sendMessage(Text.translatable("message.voiceattackapi.update_mappings"), false);
                 }
 
                 if (restartSocketServer.wasPressed()) {
                     restartSocketServer();
-                    client.player.sendMessage(net.minecraft.text.Text.literal("VoiceAttack API: SocketServer restarted"), false);
+                    client.player.sendMessage(Text.translatable("message.voiceattackapi.restart_socket_server"), false);
                 }
             }
         });
