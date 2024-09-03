@@ -1,0 +1,8 @@
+{
+  "category.voiceattackapi.general":  "VoiceAttack API",
+  "key.voiceattackapi.update_mappings": "Update Mappings",
+  "key.voiceattackapi.restart_socket_server": "Restart Socket Server",
+
+  "message.voiceattackapi.update_mappings": "VoiceAttack API: Keybind mappings updated",
+  "message.voiceattackapi.restart_socket_server": "VoiceAttack API: SocketServer restarted"
+}
