@@ -8,7 +8,7 @@
     "TooterTutor"
   ],
   "contact": {
-    "repo": "https://github.com/TooterTutor/MinecraftVA"
+    "repo": "https://github.com/TooterTutor/MinecraftVA-Mod"
   },
   "license": "MIT",
   "icon": "assets/minecraftva/icon.png",
@@ -21,6 +21,7 @@
   "mixins": [
     "minecraftva.mixins.json"
   ],
+  "accessWidener": "voiceattackapi.accesswidener",
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
