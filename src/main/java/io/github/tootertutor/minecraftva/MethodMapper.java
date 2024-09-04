@@ -11,16 +11,9 @@ public class MethodMapper {
     public void updateMappings(Map<String, KeyBinding> keybinds) {
         mappings.clear();
         for (Map.Entry<String, KeyBinding> entry : keybinds.entrySet()) {
-            String methodName = getMethodNameForKeybind(entry.getValue());
-            mappings.put(entry.getKey(), methodName);
+            mappings.put(entry.getKey(), entry.getKey());
         }
         MinecraftVA.LOGGER.info("Updated method mappings. Total mapped: " + mappings.size());
-    }
-
-    private String getMethodNameForKeybind(KeyBinding keyBinding) {
-        // This is a placeholder. In practice, you'd need to implement
-        // version-specific logic to map keybinds to their actual methods.
-        return "execute_" + keyBinding.getTranslationKey().replace(".", "_");
     }
 
     public Map<String, String> getMappings() {

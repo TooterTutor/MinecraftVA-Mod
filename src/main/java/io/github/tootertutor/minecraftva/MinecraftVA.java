@@ -11,6 +11,8 @@ import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.function.Consumer;
+
 public class MinecraftVA implements ModInitializer {
     public static final String MOD_ID = "voiceattackapi";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -20,7 +22,7 @@ public class MinecraftVA implements ModInitializer {
     private DataExporter dataExporter;
     private KeyBinding updateKeybindMapping;
     private KeyBinding restartSocketServer;
-    private KeybindExecutor keybindExecutor;
+    private KeybindMethodInvoker keybindMethodInvoker;
     private SocketServer socketServer;
     private boolean initialized = false;
 
@@ -31,8 +33,11 @@ public class MinecraftVA implements ModInitializer {
         this.keybindManager = new KeybindManager();
         this.methodMapper = new MethodMapper();
         this.dataExporter = new DataExporter();
-        this.keybindExecutor = new KeybindExecutor(MinecraftClient.getInstance());
-        this.socketServer = new SocketServer(keybindExecutor, methodMapper);
+        this.keybindMethodInvoker = new KeybindMethodInvoker(MinecraftClient.getInstance(), this.keybindManager);
+
+        // Create a Consumer<String> that will be passed to the SocketServer
+        Consumer<String> methodInvoker = this.keybindMethodInvoker::invokeMethod;
+        this.socketServer = new SocketServer(methodInvoker, methodMapper);
 
         // Register the update keybind mapping
         updateKeybindMapping = KeyBindingHelper.registerKeyBinding(new KeyBinding(
@@ -60,12 +65,12 @@ public class MinecraftVA implements ModInitializer {
             if (initialized) {
                 if (updateKeybindMapping.wasPressed()) {
                     updateKeybinds();
-                    client.player.sendMessage(Text.translatable("message.voiceattackapi.update_mappings"), false);
+                    client.player.sendMessage(Text.literal("Updated keybind mappings"), false);
                 }
 
                 if (restartSocketServer.wasPressed()) {
                     restartSocketServer();
-                    client.player.sendMessage(Text.translatable("message.voiceattackapi.restart_socket_server"), false);
+                    client.player.sendMessage(Text.literal("Restarted socket server"), false);
                 }
             }
         });
@@ -76,7 +81,8 @@ public class MinecraftVA implements ModInitializer {
 
     private void updateKeybinds() {
         keybindManager.updateKeybinds();
-        methodMapper.updateMappings(keybindManager.getRegisteredKeybinds());
+        methodMapper.updateMappings(keybindManager.registeredKeybinds);
+        keybindMethodInvoker.updateMethods(keybindManager.registeredKeybinds);
         dataExporter.exportData(methodMapper.getMappings());
     }
 
@@ -85,7 +91,8 @@ public class MinecraftVA implements ModInitializer {
         if (socketServer != null) {
             socketServer.stop();
         }
-        socketServer = new SocketServer(keybindExecutor, methodMapper);
+        Consumer<String> methodInvoker = this.keybindMethodInvoker::invokeMethod;
+        socketServer = new SocketServer(methodInvoker, methodMapper);
         socketServer.start();
     }
 

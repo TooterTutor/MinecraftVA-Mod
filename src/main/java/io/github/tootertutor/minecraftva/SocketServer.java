@@ -10,18 +10,19 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class SocketServer {
     private static final int PORT = 25565;
-    private final KeybindExecutor keybindExecutor;
+    private final Consumer<String> methodInvoker;
     private final MethodMapper methodMapper;
     private volatile boolean running;
     private final Gson gson = new Gson();
     private ServerSocket serverSocket;
     private ExecutorService executor;
 
-    public SocketServer(KeybindExecutor keybindExecutor, MethodMapper methodMapper) {
-        this.keybindExecutor = keybindExecutor;
+    public SocketServer(Consumer<String> methodInvoker, MethodMapper methodMapper) {
+        this.methodInvoker = methodInvoker;
         this.methodMapper = methodMapper;
         this.executor = Executors.newSingleThreadExecutor();
     }
@@ -78,11 +79,18 @@ public class SocketServer {
                         return gson.toJson(errorResponse);
                     }
 
-                    boolean success = keybindExecutor.executeMethod(translationKey);
-                    JsonObject response = new JsonObject();
-                    response.addProperty("success", success);
-                    response.addProperty("message", success ? "Method executed: " + translationKey : "Failed to execute method: " + translationKey);
-                    return gson.toJson(response);
+                    try {
+                        methodInvoker.accept(translationKey);
+                        JsonObject response = new JsonObject();
+                        response.addProperty("success", true);
+                        response.addProperty("message", "Method invoked: " + translationKey);
+                        return gson.toJson(response);
+                    } catch (Exception e) {
+                        JsonObject errorResponse = new JsonObject();
+                        errorResponse.addProperty("success", false);
+                        errorResponse.addProperty("message", "Failed to invoke method: " + translationKey + ". Error: " + e.getMessage());
+                        return gson.toJson(errorResponse);
+                    }
                 case "getMappings":
                     return gson.toJson(methodMapper.getMappings());
                 default:
@@ -102,6 +110,8 @@ public class SocketServer {
 
     public void stop() {
         running = false;
+        closeServerSocket();
+        shutdownExecutor();
     }
 
     private void closeServerSocket() {
