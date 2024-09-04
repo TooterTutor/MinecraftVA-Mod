@@ -47,6 +47,9 @@ processResources {
 
 processResources {
     inputs.property "version", project.version
+    loom {
+        accessWidenerPath = file("src/main/resources/voiceattackapi.accesswidener")
+    }
 
     filesMatching("fabric.mod.json") {
         expand "version": project.version
