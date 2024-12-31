@@ -1,0 +1,39 @@
+# Java environment .gitignore
+
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar
+*.gz
+*.rar
+
+# IDE files
+*.iml
+*.ipr
+*.iws
+*.idea
+*.eclipse
+*.metadata
+
+# Maven and Gradle files
+target/
+build/
+run/
+bin/
+.gradle
+pom.xml.tag
+
+# Log files
+*.log
+*.out
+*.err
+
+# Miscellaneous
+.DS_Store
+Thumbs.db
+ehcache/
+hsperfdata/
+.settings/
+.springBeans
