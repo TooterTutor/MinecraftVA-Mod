@@ -1,5 +1,6 @@
-package io.github.tootertutor.minecraftva;
+package io.github.tootertutor.minecraftva.Data;
 
+import io.github.tootertutor.minecraftva.MinecraftVA;
 import net.minecraft.client.option.KeyBinding;
 
 import java.util.HashMap;
@@ -18,9 +19,5 @@ public class MethodMapper {
 
     public Map<String, String> getMappings() {
         return new HashMap<>(mappings);
-    }
-
-    public String getMethodNameForTranslationKey(String translationKey) {
-        return mappings.get(translationKey);
     }
 }
