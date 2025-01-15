@@ -1,7 +1,8 @@
-package io.github.tootertutor.minecraftva;
+package io.github.tootertutor.minecraftva.Data;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.github.tootertutor.minecraftva.MinecraftVA;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.FileWriter;
@@ -13,7 +14,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class DataExporter {
-    private static final String EXPORT_FILE_NAME = "voiceattack_keybinds.json";
+    private static final String EXPORT_FILE_NAME = "voiceattack_translation_keys.json";
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private Map<String, String> lastExportedMappings = null;
