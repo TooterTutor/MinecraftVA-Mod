@@ -1,5 +1,12 @@
 package io.github.tootertutor.minecraftva;
 
+import io.github.tootertutor.minecraftva.Config.ConfigManager;
+import io.github.tootertutor.minecraftva.Data.DataExporter;
+import io.github.tootertutor.minecraftva.Data.MethodMapper;
+import io.github.tootertutor.minecraftva.Keybinds.KeybindManager;
+import io.github.tootertutor.minecraftva.Keybinds.KeybindMethodInvoker;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -25,10 +32,15 @@ public class MinecraftVA implements ModInitializer {
     private KeybindMethodInvoker keybindMethodInvoker;
     private SocketServer socketServer;
     private boolean initialized = false;
+    private static ConfigManager config;
 
     @Override
     public void onInitialize() {
         LOGGER.info("Initializing VoiceAttack API Mod");
+
+        // Register the Config
+        AutoConfig.register(ConfigManager.class, JanksonConfigSerializer::new);
+        config = AutoConfig.getConfigHolder(ConfigManager.class).getConfig();
 
         this.keybindManager = new KeybindManager();
         this.methodMapper = new MethodMapper();
@@ -82,7 +94,6 @@ public class MinecraftVA implements ModInitializer {
     private void updateKeybinds() {
         keybindManager.updateKeybinds();
         methodMapper.updateMappings(keybindManager.registeredKeybinds);
-        keybindMethodInvoker.updateMethods(keybindManager.registeredKeybinds);
         dataExporter.exportData(methodMapper.getMappings());
     }
 
