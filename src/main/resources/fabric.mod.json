@@ -7,24 +7,41 @@
   "authors": [
     "TooterTutor"
   ],
+
   "contact": {
     "repo": "https://github.com/TooterTutor/MinecraftVA-Mod"
   },
+
   "license": "MIT",
   "icon": "assets/minecraftva/icon.png",
   "environment": "client",
+
   "entrypoints": {
     "main": [
       "io.github.tootertutor.minecraftva.MinecraftVA"
+    ],
+
+    "modmenu": [
+      "io.github.tootertutor.minecraftva.Config.ModMenuIntegration"
     ]
   },
   "mixins": [
     "minecraftva.mixins.json"
   ],
+
+  "suggests": {
+    "another-mod": "*"
+  },
+
   "accessWidener": "voiceattackapi.accesswidener",
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
     "minecraft": "${minecraft_version}"
+  },
+
+  "custom": {
+    "modmenu:clientsideOnly": true,
+    "modmenu:api": false
   }
 }
