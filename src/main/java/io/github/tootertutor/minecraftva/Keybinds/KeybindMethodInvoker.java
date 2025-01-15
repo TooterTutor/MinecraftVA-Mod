@@ -1,10 +1,9 @@
-package io.github.tootertutor.minecraftva;
+package io.github.tootertutor.minecraftva.Keybinds;
 
+import io.github.tootertutor.minecraftva.MinecraftVA;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.text.KeybindTextContent;
-
-import java.util.Map;
+import net.minecraft.client.util.InputUtil;
 
 public class KeybindMethodInvoker {
     private final MinecraftClient client;
@@ -15,16 +14,18 @@ public class KeybindMethodInvoker {
         this.keybindManager = keybindManager;
     }
 
-    public void updateMethods(Map<String, KeyBinding> keybinds) {
-        // No need to do anything here
-    }
-
     public void invokeMethod(String translationKey) {
         MinecraftVA.LOGGER.debug("Attempting to invoke method for translation key: " + translationKey);
         KeyBinding keyBinding = keybindManager.getKeybindByTranslationKey(translationKey);
         if (keyBinding != null) {
             try {
-                KeyBinding.onKeyPressed(keyBinding.boundKey);
+                InputUtil.Key oldKey = keyBinding.boundKey;
+                InputUtil.Key tmp = InputUtil.fromTranslationKey("key.keyboard.f22");
+                keyBinding.setBoundKey(tmp);
+                KeyBinding.updateKeysByCode();
+                KeyBinding.onKeyPressed(tmp);
+                keyBinding.setBoundKey(oldKey);
+                KeyBinding.updateKeysByCode();
                 MinecraftVA.LOGGER.info("Invoked method for keybind: " + translationKey);
             } catch (Exception e) {
                 MinecraftVA.LOGGER.error("Failed to invoke method for keybind: " + translationKey, e);
