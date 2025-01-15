@@ -12,7 +12,7 @@ import net.fabricmc.api.Environment;
 @Environment(EnvType.CLIENT)
 public class ConfigManager implements ConfigData {
     public boolean randomPort = false;
-    public int port = 28643;
+    public int port = 28463;
 
     public int getPort() {
         if (randomPort) {
