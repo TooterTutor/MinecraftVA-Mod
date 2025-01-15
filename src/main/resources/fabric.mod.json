@@ -16,15 +16,26 @@
   "entrypoints": {
     "main": [
       "io.github.tootertutor.minecraftva.MinecraftVA"
+    ],
+
+    "modmenu": [
+      "io.github.tootertutor.minecraftva.Config.ModMenuIntegration"
     ]
   },
+
   "mixins": [
     "minecraftva.mixins.json"
   ],
   "accessWidener": "voiceattackapi.accesswidener",
+
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
     "minecraft": "${minecraft_version}"
+  },
+
+  "custom": {
+    "modmenu:clientsideOnly": true,
+    "modmenu:api": false
   }
 }
