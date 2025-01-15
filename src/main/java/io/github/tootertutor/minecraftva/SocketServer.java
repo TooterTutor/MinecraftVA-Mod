@@ -15,6 +15,10 @@ import com.google.gson.JsonObject;
 
 import io.github.tootertutor.minecraftva.Config.ConfigManager;
 import io.github.tootertutor.minecraftva.Data.MethodMapper;
+/*
+* TODO
+* send hello to VoiceAttack with configured port
+ */
 
 public class SocketServer {
     private final ConfigManager configManager = new ConfigManager(); // Instance of ConfigManager
