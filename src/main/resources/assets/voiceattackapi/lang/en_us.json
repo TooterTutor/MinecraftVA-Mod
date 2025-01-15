@@ -7,8 +7,8 @@
   "message.voiceattackapi.restart_socket_server": "VoiceAttack API: SocketServer restarted",
 
   "text.autoconfig.VoiceAttackAPI.title": "VoiceAttackAPI Configuration",
-  "text.autoconfig.VoiceAttackAPI.option.portRandomizer": "Random Port",
-  "text.autoconfig.VoiceAttackAPI.option.portRandomizer.@Tooltip": "Toggle Assignment of a Random Port on load (This is for communication between the mod and VoiceAttack)",
+  "text.autoconfig.VoiceAttackAPI.option.randomPort": "Random Port",
+  "text.autoconfig.VoiceAttackAPI.option.randomPort.@Tooltip": "Toggle Assignment of a Random Port on load (This is for communication between the mod and VoiceAttack)",
   "text.autoconfig.VoiceAttackAPI.option.port": "Port Number",
   "text.autoconfig.VoiceAttackAPI.option.port.@Tooltip": "Select Port number to Communicate between Minecraft and VoiceAttack"
 }

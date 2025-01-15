@@ -8,7 +8,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 @Config(name = "VoiceAttackAPI")
-@Config.Gui.Background("minecraft:/textures/block/gray_stained_glass.png")
+@Config.Gui.Background("minecraft:textures/block/gray_stained_glass.png")
 @Environment(EnvType.CLIENT)
 public class ConfigManager implements ConfigData {
     public boolean randomPort = false;
