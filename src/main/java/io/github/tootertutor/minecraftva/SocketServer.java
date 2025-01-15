@@ -18,10 +18,10 @@ import io.github.tootertutor.minecraftva.Data.MethodMapper;
 /*
 * TODO
 * send hello to VoiceAttack with configured port
- */
+*/
 
 public class SocketServer {
-    private final ConfigManager configManager = new ConfigManager(); // Instance of ConfigManager
+    private final ConfigManager configManager; // Instance of ConfigManager
     private final int PORT; // Declare PORT as an instance variable
     private final Consumer<String> methodInvoker;
     private final MethodMapper methodMapper;
@@ -30,11 +30,12 @@ public class SocketServer {
     private ServerSocket serverSocket;
     private ExecutorService executor;
 
-    public SocketServer(Consumer<String> methodInvoker, MethodMapper methodMapper) {
+    public SocketServer(ConfigManager configManager, Consumer<String> methodInvoker, MethodMapper methodMapper) {
         this.methodInvoker = methodInvoker;
         this.methodMapper = methodMapper;
         this.executor = Executors.newSingleThreadExecutor();
-        this.PORT = configManager.getPort(); // Initialize PORT in the constructor
+        this.configManager = configManager; // Initialize the configManager
+        this.PORT = this.configManager.getPort(); // Initialize PORT in the constructor
     }
 
     public void start() {

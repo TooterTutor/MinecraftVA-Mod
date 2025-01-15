@@ -1,5 +1,11 @@
 package io.github.tootertutor.minecraftva;
 
+import java.util.function.Consumer;
+
+import org.lwjgl.glfw.GLFW;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.tootertutor.minecraftva.Config.ConfigManager;
 import io.github.tootertutor.minecraftva.Data.DataExporter;
 import io.github.tootertutor.minecraftva.Data.MethodMapper;
@@ -14,11 +20,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
-import org.lwjgl.glfw.GLFW;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.function.Consumer;
 
 public class MinecraftVA implements ModInitializer {
     public static final String MOD_ID = "voiceattackapi";
@@ -41,6 +42,7 @@ public class MinecraftVA implements ModInitializer {
         // Register the Config
         AutoConfig.register(ConfigManager.class, JanksonConfigSerializer::new);
         config = AutoConfig.getConfigHolder(ConfigManager.class).getConfig();
+        LOGGER.info("Loaded configuration: randomPort = " + config.randomPort + ", port = " + config.port);
 
         this.keybindManager = new KeybindManager();
         this.methodMapper = new MethodMapper();
@@ -49,7 +51,7 @@ public class MinecraftVA implements ModInitializer {
 
         // Create a Consumer<String> that will be passed to the SocketServer
         Consumer<String> methodInvoker = this.keybindMethodInvoker::invokeMethod;
-        this.socketServer = new SocketServer(methodInvoker, methodMapper);
+        this.socketServer = new SocketServer(config, methodInvoker, methodMapper);
 
         // Register the update keybind mapping
         updateKeybindMapping = KeyBindingHelper.registerKeyBinding(new KeyBinding(
@@ -103,7 +105,7 @@ public class MinecraftVA implements ModInitializer {
             socketServer.stop();
         }
         Consumer<String> methodInvoker = this.keybindMethodInvoker::invokeMethod;
-        socketServer = new SocketServer(methodInvoker, methodMapper);
+        socketServer = new SocketServer(config, methodInvoker, methodMapper);
         socketServer.start();
     }
 
