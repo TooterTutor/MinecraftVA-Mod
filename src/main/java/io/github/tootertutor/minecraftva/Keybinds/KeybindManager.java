@@ -1,5 +1,6 @@
-package io.github.tootertutor.minecraftva;
+package io.github.tootertutor.minecraftva.Keybinds;
 
+import io.github.tootertutor.minecraftva.MinecraftVA;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.MinecraftClient;
 
@@ -7,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class KeybindManager {
-    protected Map<String, KeyBinding> registeredKeybinds = new HashMap<>();
+    public Map<String, KeyBinding> registeredKeybinds = new HashMap<>();
 
     public void updateKeybinds() {
         registeredKeybinds.clear();
