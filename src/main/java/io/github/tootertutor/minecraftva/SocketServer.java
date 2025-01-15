@@ -1,7 +1,5 @@
 package io.github.tootertutor.minecraftva;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -12,8 +10,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import io.github.tootertutor.minecraftva.Config.ConfigManager;
+import io.github.tootertutor.minecraftva.Data.MethodMapper;
+
 public class SocketServer {
-    private static final int PORT = 25565;
+    private final ConfigManager configManager = new ConfigManager(); // Instance of ConfigManager
+    private final int PORT; // Declare PORT as an instance variable
     private final Consumer<String> methodInvoker;
     private final MethodMapper methodMapper;
     private volatile boolean running;
@@ -25,6 +30,7 @@ public class SocketServer {
         this.methodInvoker = methodInvoker;
         this.methodMapper = methodMapper;
         this.executor = Executors.newSingleThreadExecutor();
+        this.PORT = configManager.getPort(); // Initialize PORT in the constructor
     }
 
     public void start() {
