@@ -15,10 +15,6 @@ import com.google.gson.JsonObject;
 
 import io.github.tootertutor.minecraftva.Config.ConfigManager;
 import io.github.tootertutor.minecraftva.Data.MethodMapper;
-/*
-* TODO
-* send hello to VoiceAttack with configured port
-*/
 
 public class SocketServer {
     private final ConfigManager configManager; // Instance of ConfigManager
@@ -30,18 +26,53 @@ public class SocketServer {
     private ServerSocket serverSocket;
     private ExecutorService executor;
 
+    private static final int VOICE_ATTACK_PORT = 28463; // Fallback port for VoiceAttack
+    private boolean randomPortMode; // This should be set based on your configuration logic
+    private int defaultPort; // Store the default port for comparison
+
     public SocketServer(ConfigManager configManager, Consumer<String> methodInvoker, MethodMapper methodMapper) {
         this.methodInvoker = methodInvoker;
         this.methodMapper = methodMapper;
         this.executor = Executors.newSingleThreadExecutor();
         this.configManager = configManager; // Initialize the configManager
-        this.PORT = this.configManager.getPort(); // Initialize PORT in the constructor
+        this.defaultPort = this.configManager.getPort(); // Initialize defaultPort
+        this.PORT = this.defaultPort; // Initialize PORT in the constructor
+        this.randomPortMode = false; // Set this based on your configuration logic
     }
 
     public void start() {
         running = true;
         MinecraftVA.LOGGER.info("SocketServer starting...");
         executor.submit(this::run);
+
+        // Start a separate thread to listen for handshake on VOICE_ATTACK_PORT
+        new Thread(this::listenForHandshake).start();
+    }
+
+    private void listenForHandshake() {
+        try (ServerSocket handshakeServerSocket = new ServerSocket(VOICE_ATTACK_PORT)) {
+            while (running) {
+                try (Socket clientSocket = handshakeServerSocket.accept();
+                     BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                     PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
+
+                    String inputLine = in.readLine();
+                    MinecraftVA.LOGGER.info("Received handshake command: " + inputLine);
+
+                    JsonObject jsonCommand = gson.fromJson(inputLine, JsonObject.class);
+                    if (jsonCommand.has("command") && "handshake".equals(jsonCommand.get("command").getAsString())) {
+                        JsonObject response = new JsonObject();
+                        response.addProperty("port", PORT);
+                        out.println(gson.toJson(response));
+                        MinecraftVA.LOGGER.info("Sent handshake response with port: " + PORT);
+                    }
+                } catch (Exception e) {
+                    MinecraftVA.LOGGER.error("Error handling handshake", e);
+                }
+            }
+        } catch (Exception e) {
+            MinecraftVA.LOGGER.error("Error in handshake listener", e);
+        }
     }
 
     private void run() {
@@ -52,16 +83,7 @@ public class SocketServer {
                 MinecraftVA.LOGGER.info("Waiting for client connection...");
                 try (Socket clientSocket = serverSocket.accept()) {
                     MinecraftVA.LOGGER.info("Client connected: " + clientSocket.getInetAddress());
-                    try (
-                            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)
-                    ) {
-                        String inputLine = in.readLine();
-                        MinecraftVA.LOGGER.info("Received command: " + inputLine);
-                        String result = handleCommand(inputLine);
-                        MinecraftVA.LOGGER.info("Sending response: " + result);
-                        out.println(result);
-                    }
+                    handleClientConnection(clientSocket);
                 }
             }
         } catch (Exception e) {
@@ -70,6 +92,31 @@ public class SocketServer {
             }
         } finally {
             closeServerSocket();
+        }
+    }
+
+    private void handleClientConnection(Socket clientSocket) {
+        try (
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)
+        ) {
+            String inputLine = in.readLine();
+            MinecraftVA.LOGGER.info("Received command: " + inputLine);
+
+            // Validate input before processing
+            if (inputLine == null || inputLine.trim().isEmpty()) {
+                JsonObject errorResponse = new JsonObject();
+                errorResponse.addProperty("success", false);
+                errorResponse.addProperty("message", "Received empty command");
+                out.println(gson.toJson(errorResponse));
+                return;
+            }
+
+            String result = handleCommand(inputLine);
+            MinecraftVA.LOGGER.info("Sending response: " + result);
+            out.println(result);
+        } catch (Exception e) {
+            MinecraftVA.LOGGER.error("Error handling client connection", e);
         }
     }
 
