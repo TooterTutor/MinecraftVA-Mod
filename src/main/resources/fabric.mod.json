@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "minecraftva",
+  "id": "voiceattackapi",
   "version": "${version}",
-  "name": "MinecraftVA",
+  "name": "VoiceAttack API",
   "description": "A bridge between Minecraft and VoiceAttack",
   "authors": [
     "TooterTutor"

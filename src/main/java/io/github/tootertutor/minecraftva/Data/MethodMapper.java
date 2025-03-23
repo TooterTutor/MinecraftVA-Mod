@@ -12,7 +12,7 @@ public class MethodMapper {
     public void updateMappings(Map<String, KeyBinding> keybinds) {
         mappings.clear();
         for (Map.Entry<String, KeyBinding> entry : keybinds.entrySet()) {
-            mappings.put(entry.getKey(), entry.getKey());
+            mappings.put(entry.getValue().getBoundKeyLocalizedText().getString(), entry.getKey());
         }
         MinecraftVA.LOGGER.info("Updated method mappings. Total mapped: " + mappings.size());
     }
