@@ -45,31 +45,40 @@ public class SocketServer {
         MinecraftVA.LOGGER.info("SocketServer starting...");
         executor.submit(this::run);
 
-        // Start a separate thread to listen for handshake on VOICE_ATTACK_PORT
-        new Thread(this::listenForHandshake).start();
+        // Start a separate thread to send handshake to VoiceAttack
+        new Thread(this::sendHandshake).start();
     }
 
-    private void listenForHandshake() {
-        try (ServerSocket handshakeServerSocket = new ServerSocket(VOICE_ATTACK_PORT)) {
-            while (running) {
-                try (Socket clientSocket = handshakeServerSocket.accept();
-                     BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                     PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
+    private void sendHandshake() {
+        try {
+            // Create a socket to connect to VoiceAttack
+            Socket voiceAttackSocket = new Socket("localhost", VOICE_ATTACK_PORT);
+            PrintWriter out = new PrintWriter(voiceAttackSocket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(voiceAttackSocket.getInputStream()));
 
-                    String inputLine = in.readLine();
-                    MinecraftVA.LOGGER.info("Received handshake command: " + inputLine);
+            // Create handshake JSON object
+            JsonObject handshakeCommand = new JsonObject();
+            handshakeCommand.addProperty("command", "handshake");
+            handshakeCommand.addProperty("port", PORT);
 
-                    JsonObject jsonCommand = gson.fromJson(inputLine, JsonObject.class);
-                    if (jsonCommand.has("command") && "handshake".equals(jsonCommand.get("command").getAsString())) {
-                        JsonObject response = new JsonObject();
-                        response.addProperty("port", PORT);
-                        out.println(gson.toJson(response));
-                        MinecraftVA.LOGGER.info("Sent handshake response with port: " + PORT);
-                    }
-                } catch (Exception e) {
-                    MinecraftVA.LOGGER.error("Error handling handshake", e);
-                }
+            // Send handshake command to VoiceAttack
+            out.println(gson.toJson(handshakeCommand));
+            MinecraftVA.LOGGER.info("Sent handshake command: " + gson.toJson(handshakeCommand));
+
+            // Wait for acknowledgment from VoiceAttack
+            String response = in.readLine();
+            MinecraftVA.LOGGER.info("Received acknowledgment.");
+
+            // Handle the acknowledgment if needed
+            JsonObject jsonResponse = gson.fromJson(response, JsonObject.class);
+            if (jsonResponse.has("status") && "acknowledged".equals(jsonResponse.get("status").getAsString())) {
+                MinecraftVA.LOGGER.info("Handshake acknowledged by VoiceAttack.");
+            } else {
+                MinecraftVA.LOGGER.warn("Handshake not acknowledged.");
             }
+
+            // Close the socket after communication
+            voiceAttackSocket.close();
         } catch (Exception e) {
             MinecraftVA.LOGGER.error("Error in handshake listener", e);
         }
@@ -98,8 +107,7 @@ public class SocketServer {
     private void handleClientConnection(Socket clientSocket) {
         try (
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)
-        ) {
+                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
             String inputLine = in.readLine();
             MinecraftVA.LOGGER.info("Received command: " + inputLine);
 
@@ -127,8 +135,9 @@ public class SocketServer {
 
             switch (action) {
                 case "executeMethod":
-                    String translationKey = jsonCommand.has("translationKey") ?
-                            jsonCommand.get("translationKey").getAsString() : null;
+                    String translationKey = jsonCommand.has("translationKey")
+                            ? jsonCommand.get("translationKey").getAsString()
+                            : null;
 
                     if (translationKey == null || translationKey.isEmpty()) {
                         JsonObject errorResponse = new JsonObject();
@@ -146,7 +155,8 @@ public class SocketServer {
                     } catch (Exception e) {
                         JsonObject errorResponse = new JsonObject();
                         errorResponse.addProperty("success", false);
-                        errorResponse.addProperty("message", "Failed to invoke method: " + translationKey + ". Error: " + e.getMessage());
+                        errorResponse.addProperty("message",
+                                "Failed to invoke method: " + translationKey + ". Error: " + e.getMessage());
                         return gson.toJson(errorResponse);
                     }
                 case "getMappings":
